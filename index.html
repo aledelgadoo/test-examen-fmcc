@@ -3,39 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Examen Completo</title>
+    <title>Simulador Examen - FMCC</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 700px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .card { background: white; width: 100%; max-width: 700px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; position: relative; }
         h1 { color: #2c3e50; font-size: 28px; margin-bottom: 10px; }
         h2 { color: #7f8c8d; font-size: 18px; font-weight: normal; margin-bottom: 30px; }
         
-        /* Grid de botones para elegir tema */
+        /* Grid de botones */
         .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
         
         .btn { padding: 15px; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: 0.2s; font-weight: bold; color: white; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn:active { transform: scale(0.98); }
 
-        /* Colores por tema */
         .btn-theme { background-color: #34495e; }
         .btn-theme:hover { background-color: #2c3e50; }
         
-        .btn-general { background-color: #e74c3c; grid-column: span 2; font-size: 1.3em; padding: 20px; }
-        .btn-general:hover { background-color: #c0392b; }
+        .btn-general { background-color: #2980b9; grid-column: span 2; font-size: 1.2em; }
+        
+        /* Botón especial para las fijas */
+        .btn-fijas { background-color: #e74c3c; grid-column: span 2; font-size: 1.3em; border: 2px solid #c0392b; animation: pulse 2s infinite; }
+        .btn-fijas:hover { background-color: #c0392b; }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
 
-        /* Estilos del examen */
+        /* Botón de Salir (X) */
+        .btn-exit { position: absolute; top: 20px; right: 20px; background: #ecf0f1; color: #7f8c8d; border: none; font-size: 14px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .btn-exit:hover { background: #bdc3c7; color: #2c3e50; }
+
+        /* Estilos examen */
         .progress { color: #7f8c8d; margin-bottom: 20px; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .question-box { font-size: 1.35em; font-weight: 600; color: #2c3e50; margin: 30px 0; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         
-        input[type="text"] {
-            width: 80%; padding: 15px; font-size: 1.2em; border: 2px solid #bdc3c7; border-radius: 8px; margin-bottom: 20px; outline: none; transition: 0.3s; text-align: center;
-        }
+        input[type="text"] { width: 80%; padding: 15px; font-size: 1.2em; border: 2px solid #bdc3c7; border-radius: 8px; margin-bottom: 20px; outline: none; transition: 0.3s; text-align: center; }
         input[type="text"]:focus { border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.3); }
 
         .btn-action { background-color: #3498db; width: auto; padding: 15px 40px; }
         .btn-next { background-color: #2c3e50; display: none; width: auto; padding: 15px 40px; margin-top: 20px; }
 
-        /* Feedback */
         .feedback { margin-top: 20px; padding: 20px; border-radius: 8px; display: none; text-align: left; }
         .feedback.correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; text-align: center; }
         .feedback.wrong { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -43,34 +48,69 @@
 
         .score-final { font-size: 4em; font-weight: 800; color: #2c3e50; margin: 10px 0; }
         .hidden { display: none; }
-        
-        .menu-btn { background-color: #95a5a6; margin-top: 10px; }
+
+        /* Estilo para la esquina superior izquierda */
+        .github-corner {
+            position: absolute;
+            top: 2px;
+            left: 20px;
+            text-align: left;
+            z-index: 1000; /* Para asegurar que flote por encima de todo */
+        }
+
+        .github-corner p {
+            margin: 0 0 2px 0;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* Opcional: En móviles muy pequeños, ocultamos el texto y dejamos solo la estrella para que no moleste */
+        @media (max-width: 600px) {
+            .github-corner p { display: none; }
+        }
     </style>
 </head>
 <body>
+    <div class="github-corner">
+        <h4>¿Te es útil? ⭐ en GitHub</h4>
+        <a class="github-button" 
+           href="https://github.com/aledelgadoo/test-examen-fmcc" 
+           data-color-scheme="no-preference: light; light: light; dark: dark;" 
+           data-icon="octicon-star" 
+           data-size="large" 
+           data-show-count="true" 
+           aria-label="Star on GitHub">
+           Star
+        </a>
+    </div>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 <div class="card" id="start-screen">
-    <h1>Simulador de Examen</h1>
-    <h2>Elige qué quieres practicar hoy:</h2>
+    <h1>Simulador de Examen FMCC</h1>
+    <h2>Elige modo de estudio:</h2>
     
     <div class="grid-menu">
-        <button class="btn btn-theme" onclick="startExam('1')">Tema 1: Marketing</button>
-        <button class="btn btn-theme" onclick="startExam('2')">Tema 2: Consumidor</button>
-        <button class="btn btn-theme" onclick="startExam('3')">Tema 3: Segmentación</button>
-        <button class="btn btn-theme" onclick="startExam('4')">Tema 4: Producto</button>
-        <button class="btn btn-theme" onclick="startExam('5')">Tema 5: Precios</button>
-        <button class="btn btn-theme" onclick="startExam('6')">Tema 6 y 7: Distrib./Com.</button>
+        <button class="btn btn-fijas" onclick="startExam('fijas')">PREGUNTAS FIJAS</button>
+        
+        <button class="btn btn-theme" onclick="startExam('1')">Tema 1</button>
+        <button class="btn btn-theme" onclick="startExam('2')">Tema 2</button>
+        <button class="btn btn-theme" onclick="startExam('3')">Tema 3</button>
+        <button class="btn btn-theme" onclick="startExam('4')">Tema 4</button>
+        <button class="btn btn-theme" onclick="startExam('5')">Tema 5</button>
+        <button class="btn btn-theme" onclick="startExam('6')">Tema 6 y 7</button>
         
         <button class="btn btn-general" onclick="startExam('all')">🎲 EXAMEN GENERAL (Aleatorio)</button>
     </div>
 </div>
 
 <div class="card hidden" id="quiz-screen">
-    <div class="progress" id="progress-text">Pregunta 1 de 20</div>
+    <button class="btn-exit" onclick="returnToMenu()">✕ Menú</button>
+
+    <div class="progress" id="progress-text">...</div>
     <div class="question-box" id="question-text">...</div>
     
     <input type="text" id="user-input" placeholder="Escribe tu respuesta..." autocomplete="off">
-    
     <br>
     <button class="btn btn-action" id="btn-action" onclick="checkAnswer()">Comprobar</button>
     
@@ -84,16 +124,24 @@
 
 <div class="card hidden" id="result-screen">
     <h1>Resultados</h1>
-    <div class="score-final" id="score-display">0 / 20</div>
+    <div class="score-final" id="score-display">0</div>
     <p id="message-display"></p>
-    <button class="btn btn-action" onclick="location.reload()">Volver al Menú</button>
+    <button class="btn btn-action" onclick="returnToMenu()">Volver al Menú</button>
 </div>
 
 <script>
-    // BASE DE DATOS CON "TEMA" (t) ASIGNADO
-    // t:1 (Tema 1), t:2 (Tema 2), etc.
     const database = [
-        // TEMA 1: CONCEPTOS BÁSICOS
+
+        {t: 'fijas', q: "La diferencia entre las ventas totales actuales y el mercado potencial absoluto se denomina", a: "EXPANSIÓN DE LA DEMANDA"},
+        {t: 'fijas', q: "¿Qué métodos de previsión de demanda se emplean para realizar estimaciones a largo plazo?", a: "DELPHI"},
+        {t: 'fijas', q: "Si existen grandes fluctuaciones en los datos históricos de la demanda, ¿qué método de previsión de demanda a corto plazo no se puede emplear?", a: "AJUSTE DE FUNCIONES"},
+        {t: 'fijas', q: "Cuando se analizan los datos históricos de la demanda de un producto se aprecia que en los dos últimos periodos se ha producido un incremento significativo de la demanda, ¿qué tipo de método de previsión de demanda se debe emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE DE ALISAMIENTO TENDENTE A 1"},
+        {t: 'fijas', q: "¿Cómo se denomina el enfoque de marketing que se centra en las características de los productos?", a: "MIOPÍA DE MARKETING"},
+        {t: 'fijas', q: "¿En qué etapa del ciclo de vida del producto se consiguen las máximas ventas?", a: "MADUREZ"},
+        {t: 'fijas', q: "¿Cómo se denomina el método para fijar los precios que se considera objetivo y justo?", a: "BASADO EN EL COSTE"},
+        {t: 'fijas', q: "¿Cómo se denomina el método para fijar los precios que analiza a los consumidores?", a: "VALOR PERCIBIDO"},
+        {t: 'fijas', q: "Describa un canal de distribución indirecto largo:", a: "FABRICANTE - MAYORISTA - MINORISTA - CONSUMIDOR FINAL"},
+        
         {t: '1', q: "En la definición de Marketing, ¿cuál es la palabra clave?", a: "INTERCAMBIO"},
         {t: '1', q: "¿Cómo definiría el Marketing como ACCIÓN?", a: "CONQUISTA DE MERCADOS"},
         {t: '1', q: "¿Qué concepto es tratado en el Marketing como ilimitado?", a: "DESEOS"},
@@ -114,8 +162,6 @@
         {t: '1', q: "¿Cuáles son las variables del marketing operativo?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
         {t: '1', q: "Conceptos vinculados al marketing como cultura:", a: "ORIENTACIÓN AL MERCADO Y MARKETING DE RELACIONES"},
         {t: '1', q: "Concepto mental sobre la posición de una marca en relación a otras:", a: "POSICIONAMIENTO COMPETITIVO"},
-
-        // TEMA 2: COMPORTAMIENTO DEL CONSUMIDOR
         {t: '2', q: "¿Qué teoría sobre el comportamiento de compra considera que los individuos compran los productos que maximizan su utilidad?", a: "ECONÓMICA"},
         {t: '2', q: "¿Qué teoría sobre el comportamiento de compra se aplica preferentemente para el diseño de productos, envases y mensajes publicitarios?", a: "PSICOANALÍTICA"},
         {t: '2', q: "¿Qué concepto de la teoría del aprendizaje se califica como positivo si la experiencia de compra ha sido satisfactoria?", a: "FORTALECIMIENTO"},
@@ -136,8 +182,6 @@
         {t: '2', q: "¿La implicación del cliente en la producción y la calidad final del servicio qué problema origina?", a: "INSEPARABILIDAD"},
         {t: '2', q: "¿Cómo se denomina el modelo de localización que determina el límite del área comercial?", a: "CONVERSE"},
         {t: '2', q: "¿Quién formuló el modelo probabilístico de comportamiento espacial?", a: "HUFF"},
-
-        // TEMA 3: SEGMENTACIÓN
         {t: '3', q: "¿Qué dimensión de la segmentación aplica técnicas estadísticas para determinar grupos de clientes?", a: "ANALÍTICA"},
         {t: '3', q: "Si se detecta un nuevo segmento y la competencia no lo ha identificado, ¿es siempre conveniente desarrollar una estrategia centrada en él?", a: "NO, DEPENDE"},
         {t: '3', q: "La macrosegmentación se equipara en las grandes corporaciones a las:", a: "UNIDADES ESTRATÉGICAS DE NEGOCIO"},
@@ -158,8 +202,6 @@
         {t: '3', q: "Si hay grandes fluctuaciones históricas, ¿qué método a corto plazo NO se puede emplear?", a: "AJUSTE DE FUNCIONES"},
         {t: '3', q: "¿Qué tipo de oscilación analiza el componente estacional?", a: "LAS DE UN PERÍODO INFERIOR AL AÑO"},
         {t: '3', q: "Si hay un incremento significativo de demanda en los 2 últimos periodos, ¿qué método emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE TENDENTE A 1"},
-
-        // TEMA 4: PRODUCTO
         {t: '4', q: "¿Una idea puede ser considerada como un producto en marketing?", a: "SÍ"},
         {t: '4', q: "¿Enfoque de marketing centrado en las características de los productos?", a: "MIOPÍA DE MARKETING"},
         {t: '4', q: "En el concepto de producto de Kotler, la calidad es un aspecto:", a: "FORMAL"},
@@ -180,8 +222,6 @@
         {t: '4', q: "Forma, aspecto y color del producto que permite identificarlo:", a: "DISEÑO"},
         {t: '4', q: "El código de barras es un elemento que se encuentra en:", a: "ETIQUETA"},
         {t: '4', q: "¿Qué aspecto del producto hay que diseñar para reducir costes en logística?", a: "ENVASE"},
-
-        // TEMA 5: PRECIOS
         {t: '5', q: "Para el comprador el precio es el ______ que da a cambio de la utilidad.", a: "VALOR"},
         {t: '5', q: "Para la empresa el precio es un instrumento a ______ plazo.", a: "CORTO"},
         {t: '5', q: "Grupos de interés afectados por el precio (además de clientes):", a: "PROVEEDORES, ACCIONISTAS, COMPETIDORES"},
@@ -202,8 +242,6 @@
         {t: '5', q: "Caso Práctico: Si no se venden 1.500 uds, ¿aconseja producción?", a: "NO PORQUE EL PUNTO MUERTO ES 22,22 EUROS"},
         {t: '5', q: "Caso Práctico: Si competencia vende a 23€, ¿cuándo aconseja vender?", a: "SI SE VENDEN LAS 15.000 UNIDADES"},
         {t: '5', q: "Estrategia de vender marca de gran volumen bajo coste para captar ventas en otros productos:", a: "LÍDER EN PÉRDIDAS"},
-
-        // TEMA 6 y 7: DISTRIBUCIÓN Y COMUNICACIÓN
         {t: '6', q: "Describa un canal de distribución directo:", a: "FABRICANTE - CONSUMIDOR FINAL"},
         {t: '6', q: "Describa un canal de distribución indirecto corto:", a: "FABRICANTE - MINORISTA - CONSUMIDOR FINAL"},
         {t: '6', q: "Describa un canal de distribución indirecto largo:", a: "FABRICANTE - MAYORISTA - MINORISTA - CONSUMIDOR FINAL"},
@@ -231,7 +269,6 @@
     let score = 0;
     let currentTopicName = "";
 
-    // Evento ENTER en el input
     document.getElementById("user-input").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             if (document.getElementById("btn-action").style.display !== "none") {
@@ -242,29 +279,41 @@
         }
     });
 
+    function returnToMenu() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
     function startExam(topic) {
         let pool = [];
         
-        // FILTRADO POR TEMA
         if (topic === 'all') {
-            pool = [...database]; // Copia de todo
+            pool = database.filter(item => item.t !== 'fijas'); // En el general NO metemos las fijas para no falsear
             currentTopicName = "EXAMEN GENERAL";
+        } else if (topic === 'fijas') {
+            pool = database.filter(item => item.t === 'fijas');
+            currentTopicName = "🔥 PREGUNTAS FIJAS";
         } else {
-            pool = database.filter(item => item.t === topic); // Filtra por el número de tema
+            pool = database.filter(item => item.t === topic);
             currentTopicName = "TEMA " + topic;
             if(topic === '6') currentTopicName = "TEMAS 6 Y 7";
         }
         
-        // ALEATORIEDAD: Barajar las preguntas
+        if (pool.length === 0) {
+            alert("No hay preguntas en este tema todavía.");
+            return;
+        }
+
+        // Si es el modo 'fijas', no barajamos si quieres mantener el orden, o sí. (Aquí las barajo por defecto)
         let shuffled = pool.sort(() => 0.5 - Math.random());
         
-        // SELECCIONAR MAX 20 (Si es un tema, son 20 justas, pero se barajan igual)
+        // Seleccionamos max 20, o todas las que haya si son menos (como en 'fijas')
         currentQuestions = shuffled.slice(0, 20);
         
         currentIndex = 0;
         score = 0;
         
-        // CAMBIO DE PANTALLA
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
@@ -281,14 +330,12 @@
         input.disabled = false;
         input.focus();
         
-        // Reset visuales
         document.getElementById('feedback-box').style.display = 'none';
         document.getElementById('feedback-box').className = 'feedback';
         document.getElementById('btn-next').style.display = 'none';
         document.getElementById('btn-action').style.display = 'inline-block';
     }
 
-    // Función de limpieza de texto (ignora mayúsculas, tildes y signos)
     function cleanString(str) {
         return str.toLowerCase()
                   .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -305,12 +352,9 @@
         let cleanCorrect = cleanString(correctAnswer);
         let isCorrect = false;
 
-        // 1. Coincidencia exacta
         if (cleanUser === cleanCorrect) {
             isCorrect = true;
-        } 
-        // 2. Coincidencia parcial (solo si escribiste más de 3 letras)
-        else if (cleanUser.length > 3 && cleanCorrect.includes(cleanUser)) {
+        } else if (cleanUser.length > 3 && cleanCorrect.includes(cleanUser)) {
              isCorrect = true;
         }
 
@@ -355,18 +399,17 @@
         
         display.innerText = `${score} / ${currentQuestions.length}`;
         
-        // Mensajes de ánimo según nota
         let percentage = (score / currentQuestions.length) * 10;
         
         if (percentage >= 9) {
             display.style.color = '#27ae60';
-            msg.innerText = "¡IMPRESIONANTE! Nivel Experto.";
+            msg.innerText = "¡IMPRESIONANTE!";
         } else if (percentage >= 5) {
             display.style.color = '#f39c12';
-            msg.innerText = "Aprobado. Sigue practicando para asegurar el 10.";
+            msg.innerText = "Bien, aprobado.";
         } else {
             display.style.color = '#c0392b';
-            msg.innerText = "Sigue dándole caña. ¡La próxima sale mejor!";
+            msg.innerText = "A repasar más.";
         }
     }
 </script>
