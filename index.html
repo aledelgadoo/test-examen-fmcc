@@ -3,205 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Examen Dirección Comercial</title>
+    <title>Simulador de Examen Completo</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 90%; max-width: 600px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #333; font-size: 24px; margin-bottom: 10px; }
-        .progress { color: #888; margin-bottom: 20px; font-size: 0.9em; }
-        .question-box { font-size: 1.3em; font-weight: 600; color: #2c3e50; margin: 30px 0; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-        .answer-box { background-color: #e8f5e9; color: #2e7d32; padding: 20px; border-radius: 8px; margin: 20px 0; font-size: 1.2em; font-weight: bold; display: none; }
-        .btn { padding: 15px 30px; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; transition: 0.3s; margin: 5px; font-weight: bold; }
-        .btn-show { background-color: #3498db; color: white; width: 100%; }
-        .btn-show:hover { background-color: #2980b9; }
-        .btn-yes { background-color: #4caf50; color: white; width: 45%; }
-        .btn-yes:hover { background-color: #45a049; }
-        .btn-no { background-color: #f44336; color: white; width: 45%; }
-        .btn-no:hover { background-color: #d32f2f; }
-        .actions { display: none; justify-content: center; gap: 10px; }
-        .score-final { font-size: 3em; font-weight: bold; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 700px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: #2c3e50; font-size: 28px; margin-bottom: 10px; }
+        h2 { color: #7f8c8d; font-size: 18px; font-weight: normal; margin-bottom: 30px; }
+        
+        /* Grid de botones para elegir tema */
+        .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        
+        .btn { padding: 15px; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: 0.2s; font-weight: bold; color: white; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn:active { transform: scale(0.98); }
+
+        /* Colores por tema */
+        .btn-theme { background-color: #34495e; }
+        .btn-theme:hover { background-color: #2c3e50; }
+        
+        .btn-general { background-color: #e74c3c; grid-column: span 2; font-size: 1.3em; padding: 20px; }
+        .btn-general:hover { background-color: #c0392b; }
+
+        /* Estilos del examen */
+        .progress { color: #7f8c8d; margin-bottom: 20px; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .question-box { font-size: 1.35em; font-weight: 600; color: #2c3e50; margin: 30px 0; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        
+        input[type="text"] {
+            width: 80%; padding: 15px; font-size: 1.2em; border: 2px solid #bdc3c7; border-radius: 8px; margin-bottom: 20px; outline: none; transition: 0.3s; text-align: center;
+        }
+        input[type="text"]:focus { border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.3); }
+
+        .btn-action { background-color: #3498db; width: auto; padding: 15px 40px; }
+        .btn-next { background-color: #2c3e50; display: none; width: auto; padding: 15px 40px; margin-top: 20px; }
+
+        /* Feedback */
+        .feedback { margin-top: 20px; padding: 20px; border-radius: 8px; display: none; text-align: left; }
+        .feedback.correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; text-align: center; }
+        .feedback.wrong { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .correct-answer-text { font-weight: bold; margin-top: 5px; display: block; font-size: 1.1em; color: #c0392b; }
+
+        .score-final { font-size: 4em; font-weight: 800; color: #2c3e50; margin: 10px 0; }
         .hidden { display: none; }
+        
+        .menu-btn { background-color: #95a5a6; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card" id="start-screen">
     <h1>Simulador de Examen</h1>
-    <p>Base de datos: 120 preguntas extraídas de tus PDFs.</p>
-    <p>El examen generará <strong>20 preguntas aleatorias</strong>.</p>
-    <button class="btn btn-show" onclick="startExam()">¡Empezar Examen!</button>
+    <h2>Elige qué quieres practicar hoy:</h2>
+    
+    <div class="grid-menu">
+        <button class="btn btn-theme" onclick="startExam('1')">Tema 1: Marketing</button>
+        <button class="btn btn-theme" onclick="startExam('2')">Tema 2: Consumidor</button>
+        <button class="btn btn-theme" onclick="startExam('3')">Tema 3: Segmentación</button>
+        <button class="btn btn-theme" onclick="startExam('4')">Tema 4: Producto</button>
+        <button class="btn btn-theme" onclick="startExam('5')">Tema 5: Precios</button>
+        <button class="btn btn-theme" onclick="startExam('6')">Tema 6 y 7: Distrib./Com.</button>
+        
+        <button class="btn btn-general" onclick="startExam('all')">🎲 EXAMEN GENERAL (Aleatorio)</button>
+    </div>
 </div>
 
 <div class="card hidden" id="quiz-screen">
     <div class="progress" id="progress-text">Pregunta 1 de 20</div>
     <div class="question-box" id="question-text">...</div>
     
-    <button class="btn btn-show" id="btn-reveal" onclick="showAnswer()">Ver Solución</button>
+    <input type="text" id="user-input" placeholder="Escribe tu respuesta..." autocomplete="off">
     
-    <div class="answer-box" id="answer-text">...</div>
+    <br>
+    <button class="btn btn-action" id="btn-action" onclick="checkAnswer()">Comprobar</button>
     
-    <div class="actions" id="action-buttons">
-        <button class="btn btn-no" onclick="nextQuestion(false)">Fallé</button>
-        <button class="btn btn-yes" onclick="nextQuestion(true)">¡Acerté!</button>
+    <div id="feedback-box" class="feedback">
+        <span id="feedback-msg"></span>
+        <span id="real-answer" class="correct-answer-text"></span>
     </div>
+
+    <button class="btn btn-next" id="btn-next" onclick="nextQuestion()">Siguiente ➡</button>
 </div>
 
 <div class="card hidden" id="result-screen">
-    <h1>Examen Finalizado</h1>
-    <p>Tu puntuación final:</p>
+    <h1>Resultados</h1>
     <div class="score-final" id="score-display">0 / 20</div>
     <p id="message-display"></p>
-    <button class="btn btn-show" onclick="location.reload()">Repetir Examen (Nuevas Preguntas)</button>
+    <button class="btn btn-action" onclick="location.reload()">Volver al Menú</button>
 </div>
 
 <script>
-    // Base de datos completa de las 120 preguntas extraídas
+    // BASE DE DATOS CON "TEMA" (t) ASIGNADO
+    // t:1 (Tema 1), t:2 (Tema 2), etc.
     const database = [
-        // TEMA 2
-        {q: "¿Qué teoría sobre el comportamiento de compra considera que los individuos compran los productos que maximizan su utilidad?", a: "ECONÓMICA"},
-        {q: "¿Qué teoría sobre el comportamiento de compra se aplica preferentemente para el diseño de productos, envases y mensajes publicitarios?", a: "PSICOANALÍTICA"},
-        {q: "¿Qué concepto de la teoría del aprendizaje se califica como positivo si la experiencia de compra ha sido satisfactoria?", a: "FORTALECIMIENTO"},
-        {q: "La forma en que el consumidor recoge, procesa e interpreta los estímulos sensoriales se denomina:", a: "PERCEPCIÓN"},
-        {q: "La predisposición general que dirige el comportamiento de compra de los individuos se denomina:", a: "MOTIVACIÓN"},
-        {q: "En el modelo de comportamiento de compra individual, ¿la personalidad es una variable...?", a: "VARIABLE INTERNA"},
-        {q: "El estado afectivo del individuo ligado a su disposición a obrar de cierta forma ante algún estímulo se denomina:", a: "ACTITUD"},
-        {q: "En el modelo de comportamiento de compra individual, ¿la cultura es una variable...?", a: "VARIABLE EXTERNA"},
-        {q: "En el modelo de comportamiento de compra individual, ¿el precio es una variable...?", a: "VARIABLE DE MARKETING"},
-        {q: "Los grupos de trabajo son:", a: "GRUPOS FORMALES PRIMARIOS"},
-        {q: "¿A qué corresponde el rol del iniciador en la compra familiar?", a: "AL QUE INDICA LA NECESIDAD DE COMPRAR ALGO"},
-        {q: "¿Cuáles son las diferencias de la compra industrial en relación a la individual?", a: "ÉNFASIS, COMPLEJIDAD Y TIPO DE RELACIÓN CLIENTE-VENDEDOR"},
-        {q: "Conjunto de personas que necesitan un producto, desean comprarlo y tienen capacidad para hacerlo:", a: "MERCADO"},
-        {q: "¿Cómo se clasifican los grupos de interés en el modelo de agentes y fuerzas del entorno?", a: "MICROENTORNO"},
-        {q: "Según las características de los compradores, los mercados se diferencian entre:", a: "MERCADO DE CONSUMO, INDUSTRIAL Y SERVICIOS"},
-        {q: "¿En qué problema de los servicios se encuentra el no poder transmitir la propiedad de los mismos?", a: "INTANGIBILIDAD"},
-        {q: "¿En qué problema de los servicios se emplea la medición de la satisfacción de los clientes para evitarlo?", a: "HETEROGENEIDAD"},
-        {q: "¿La implicación del cliente en la producción y la calidad final del servicio qué problema origina?", a: "INSEPARABILIDAD"},
-        {q: "¿Cómo se denomina el modelo de localización que determina el límite del área comercial?", a: "CONVERSE"},
-        {q: "¿Quién formuló el modelo probabilístico de comportamiento espacial?", a: "HUFF"},
-        
-        // TEMA 3
-        {q: "¿Qué dimensión de la segmentación aplica técnicas estadísticas para determinar grupos de clientes?", a: "ANALÍTICA"},
-        {q: "Si se detecta un nuevo segmento y la competencia no lo ha identificado, ¿es siempre conveniente desarrollar una estrategia centrada en él?", a: "NO, DEPENDE"},
-        {q: "La macrosegmentación se equipara en las grandes corporaciones a las:", a: "UNIDADES ESTRATÉGICAS DE NEGOCIO"},
-        {q: "¿En qué consiste la metodología de la segmentación a priori?", a: "DETERMINAR CON ANTERIORIDAD LOS SEGMENTOS Y LUEGO ANALIZARLOS"},
-        {q: "¿El posicionamiento competitivo es anterior o posterior al proceso de segmentación?", a: "POSTERIOR"},
-        {q: "Resultado de la fórmula C=|100-(180*180/330)| (Estudio de segmentación):", a: "1,81"},
-        {q: "¿Procedimiento de división del mercado donde algunas personas pueden no clasificarse en ningún grupo?", a: "TIPOLOGÍA"},
-        {q: "¿Cómo se clasifica la dimensión estilo de vida para la segmentación?", a: "GENERAL - SUBJETIVA"},
-        {q: "Volumen total, físico o monetario adquirido por un grupo de compradores en lugar y periodo determinado:", a: "DEMANDA"},
-        {q: "Cifra de ventas que realiza el conjunto de empresas que opera en un determinado mercado:", a: "DEMANDA GLOBAL"},
-        {q: "Relación entre las ventas de una marca y las ventas totales del mercado:", a: "CUOTA DE MERCADO"},
-        {q: "Diferencia entre las ventas totales actuales y el mercado potencial absoluto:", a: "EXPANSIBILIDAD DE LA DEMANDA"},
-        {q: "¿Variables controlables por las empresas que influyen en la demanda?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
-        {q: "Procedimiento de multiplicación de sucesivos porcentajes para estimar el mercado potencial:", a: "RATIOS EN CADENA"},
-        {q: "En el modelo de Markov, ¿qué probabilidades determinan el nivel de fidelidad?", a: "LAS DE LA DIAGONAL PRINCIPAL"},
-        {q: "¿Cómo se calcula la situación de equilibrio en el modelo de Markov?", a: "HACIENDO LAS CUOTAS DE MERCADO CONSTANTES"},
-        {q: "¿Qué método de previsión de demanda se emplea para largo plazo?", a: "DELPHI"},
-        {q: "Si hay grandes fluctuaciones históricas, ¿qué método a corto plazo NO se puede emplear?", a: "AJUSTE DE FUNCIONES"},
-        {q: "¿Qué tipo de oscilación analiza el componente estacional?", a: "LAS DE UN PERÍODO INFERIOR AL AÑO"},
-        {q: "Si hay un incremento significativo de demanda en los 2 últimos periodos, ¿qué método emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE TENDENTE A 1"},
+        // TEMA 1: CONCEPTOS BÁSICOS
+        {t: '1', q: "En la definición de Marketing, ¿cuál es la palabra clave?", a: "INTERCAMBIO"},
+        {t: '1', q: "¿Cómo definiría el Marketing como ACCIÓN?", a: "CONQUISTA DE MERCADOS"},
+        {t: '1', q: "¿Qué concepto es tratado en el Marketing como ilimitado?", a: "DESEOS"},
+        {t: '1', q: "Llamar a clientes para medir calidad percibida es Marketing...", a: "MARKETING RELACIONAL"},
+        {t: '1', q: "¿De qué está compuesta la orientación al mercado?", a: "ORIENTACIÓN AL CONSUMIDOR MÁS ORIENTACIÓN A LA COMPETENCIA"},
+        {t: '1', q: "¿El Marketing de relaciones es antes o después del intercambio?", a: "DESPUÉS"},
+        {t: '1', q: "¿Estrategia de Marketing relacionada con escaso énfasis en servicio al cliente?", a: "MARKETING TRANSACCIONAL"},
+        {t: '1', q: "Estar en más puntos de venta que competidores y a menor precio es estrategia de:", a: "LIDERAZGO EN COSTES"},
+        {t: '1', q: "A nivel de negocio, ¿qué tipo de estrategia de marketing se desarrolla?", a: "MARKETING ESTRATÉGICO"},
+        {t: '1', q: "En Marketing Estratégico, ¿qué función considera el concepto analizado ampliamente?", a: "DELIMITACIÓN DEL MERCADO RELEVANTE"},
+        {t: '1', q: "El análisis de fortalezas y debilidades se realiza sobre:", a: "INTERNAMENTE A LA ORGANIZACIÓN Y A LA COMPETENCIA"},
+        {t: '1', q: "¿La fijación de objetivos es antes o después de la estrategia?", a: "ANTES DE FÓRMULAR LA ESTRATEGIA"},
+        {t: '1', q: "¿Las relaciones públicas y el poder a qué tipo de marketing hacen referencia?", a: "MEGAMARKETING"},
+        {t: '1', q: "Acuerdo con Administración Pública para reformar un parque es Marketing...", a: "MARKETING SOCIAL"},
+        {t: '1', q: "Colaborar en lucha contra tabaco a cambio de licencia comercial es Marketing...", a: "MEGAMARKETING"},
+        {t: '1', q: "Las alianzas estratégicas hacen referencia a la función de:", a: "MARKETING RELACIONAL"},
+        {t: '1', q: "¿Cuáles son las variables del marketing-mix?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
+        {t: '1', q: "¿Cuáles son las variables del marketing operativo?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
+        {t: '1', q: "Conceptos vinculados al marketing como cultura:", a: "ORIENTACIÓN AL MERCADO Y MARKETING DE RELACIONES"},
+        {t: '1', q: "Concepto mental sobre la posición de una marca en relación a otras:", a: "POSICIONAMIENTO COMPETITIVO"},
 
-        // TEMA 4
-        {q: "¿Una idea puede ser considerada como un producto en marketing?", a: "SÍ"},
-        {q: "¿Enfoque de marketing centrado en las características de los productos?", a: "MIOPÍA DE MARKETING"},
-        {q: "En el concepto de producto de Kotler, la calidad es un aspecto:", a: "FORMAL"},
-        {q: "¿En qué etapa del ciclo de vida se consigue el máximo beneficio?", a: "CRECIMIENTO"},
-        {q: "¿En qué etapa del ciclo de vida se consiguen las máximas ventas?", a: "MADUREZ"},
-        {q: "¿En qué etapa del ciclo de vida se encuentra la Wii (según el temario)?", a: "CRECIMIENTO"},
-        {q: "¿En qué etapa se comienzan a reducir los márgenes comerciales?", a: "MADUREZ"},
-        {q: "¿Cuándo es conveniente aplicar la estrategia de relanzamiento?", a: "MADUREZ"},
-        {q: "Conjunto de líneas de productos que comercializa una empresa:", a: "CARTERA DE PRODUCTOS"},
-        {q: "Estrategia de lanzar una nueva marca diferente con precio y calidad inferior:", a: "SEGUNDA MARCA"},
-        {q: "Grupo de productos estrechamente relacionados (mismas funciones, clientes, canales):", a: "LÍNEA DE PRODUCTOS"},
-        {q: "La amplitud de una cartera hace referencia al número de:", a: "LÍNEAS DE PRODUCTOS"},
-        {q: "La profundidad de una cartera hace referencia al número de:", a: "REFERENCIAS"},
-        {q: "Los componentes de una marca son:", a: "NOMBRE Y LOGOTIPO"},
-        {q: "Las marcas blancas son una estrategia de marca de:", a: "DISTRIBUIDOR"},
-        {q: "Características de comunicador, diferenciador, promotor y protector hacen referencia al:", a: "ENVASE"},
-        {q: "Estrategia de resaltar características para ser percibido como único:", a: "DIFERENCIACIÓN"},
-        {q: "Forma, aspecto y color del producto que permite identificarlo:", a: "DISEÑO"},
-        {q: "El código de barras es un elemento que se encuentra en:", a: "ETIQUETA"},
-        {q: "¿Qué aspecto del producto hay que diseñar para reducir costes en logística?", a: "ENVASE"},
+        // TEMA 2: COMPORTAMIENTO DEL CONSUMIDOR
+        {t: '2', q: "¿Qué teoría sobre el comportamiento de compra considera que los individuos compran los productos que maximizan su utilidad?", a: "ECONÓMICA"},
+        {t: '2', q: "¿Qué teoría sobre el comportamiento de compra se aplica preferentemente para el diseño de productos, envases y mensajes publicitarios?", a: "PSICOANALÍTICA"},
+        {t: '2', q: "¿Qué concepto de la teoría del aprendizaje se califica como positivo si la experiencia de compra ha sido satisfactoria?", a: "FORTALECIMIENTO"},
+        {t: '2', q: "La forma en que el consumidor recoge, procesa e interpreta los estímulos sensoriales se denomina:", a: "PERCEPCIÓN"},
+        {t: '2', q: "La predisposición general que dirige el comportamiento de compra de los individuos se denomina:", a: "MOTIVACIÓN"},
+        {t: '2', q: "En el modelo de comportamiento de compra individual, ¿la personalidad es una variable...?", a: "VARIABLE INTERNA"},
+        {t: '2', q: "El estado afectivo del individuo ligado a su disposición a obrar de cierta forma ante algún estímulo se denomina:", a: "ACTITUD"},
+        {t: '2', q: "En el modelo de comportamiento de compra individual, ¿la cultura es una variable...?", a: "VARIABLE EXTERNA"},
+        {t: '2', q: "En el modelo de comportamiento de compra individual, ¿el precio es una variable...?", a: "VARIABLE DE MARKETING"},
+        {t: '2', q: "Los grupos de trabajo son:", a: "GRUPOS FORMALES PRIMARIOS"},
+        {t: '2', q: "¿A qué corresponde el rol del iniciador en la compra familiar?", a: "AL QUE INDICA LA NECESIDAD DE COMPRAR ALGO"},
+        {t: '2', q: "¿Cuáles son las diferencias de la compra industrial en relación a la individual?", a: "ÉNFASIS, COMPLEJIDAD Y TIPO DE RELACIÓN CLIENTE-VENDEDOR"},
+        {t: '2', q: "Conjunto de personas que necesitan un producto, desean comprarlo y tienen capacidad para hacerlo:", a: "MERCADO"},
+        {t: '2', q: "¿Cómo se clasifican los grupos de interés en el modelo de agentes y fuerzas del entorno?", a: "MICROENTORNO"},
+        {t: '2', q: "Según las características de los compradores, los mercados se diferencian entre:", a: "MERCADO DE CONSUMO, INDUSTRIAL Y SERVICIOS"},
+        {t: '2', q: "¿En qué problema de los servicios se encuentra el no poder transmitir la propiedad de los mismos?", a: "INTANGIBILIDAD"},
+        {t: '2', q: "¿En qué problema de los servicios se emplea la medición de la satisfacción de los clientes para evitarlo?", a: "HETEROGENEIDAD"},
+        {t: '2', q: "¿La implicación del cliente en la producción y la calidad final del servicio qué problema origina?", a: "INSEPARABILIDAD"},
+        {t: '2', q: "¿Cómo se denomina el modelo de localización que determina el límite del área comercial?", a: "CONVERSE"},
+        {t: '2', q: "¿Quién formuló el modelo probabilístico de comportamiento espacial?", a: "HUFF"},
 
-        // TEMA 1
-        {q: "En la definición de Marketing, ¿cuál es la palabra clave?", a: "INTERCAMBIO"},
-        {q: "¿Cómo definiría el Marketing como ACCIÓN?", a: "CONQUISTA DE MERCADOS"},
-        {q: "¿Qué concepto es tratado en el Marketing como ilimitado?", a: "DESEOS"},
-        {q: "Llamar a clientes para medir calidad percibida es Marketing...", a: "MARKETING RELACIONAL"},
-        {q: "¿De qué está compuesta la orientación al mercado?", a: "ORIENTACIÓN AL CONSUMIDOR + ORIENTACIÓN A LA COMPETENCIA"},
-        {q: "¿El Marketing de relaciones es antes o después del intercambio?", a: "DESPUÉS"},
-        {q: "¿Estrategia de Marketing relacionada con escaso énfasis en servicio al cliente?", a: "MARKETING TRANSACCIONAL"},
-        {q: "Estar en más puntos de venta que competidores y a menor precio es estrategia de:", a: "LIDERAZGO EN COSTES"},
-        {q: "A nivel de negocio, ¿qué tipo de estrategia de marketing se desarrolla?", a: "MARKETING ESTRATÉGICO"},
-        {q: "En Marketing Estratégico, ¿qué función considera el concepto analizado ampliamente?", a: "DELIMITACIÓN DEL MERCADO RELEVANTE"},
-        {q: "El análisis de fortalezas y debilidades se realiza sobre:", a: "INTERNAMENTE A LA ORGANIZACIÓN Y A LA COMPETENCIA"},
-        {q: "¿La fijación de objetivos es antes o después de la estrategia?", a: "ANTES (LA ESTRATEGIA DEPENDE DE ELLOS)"},
-        {q: "¿Las relaciones públicas y el poder a qué tipo de marketing hacen referencia?", a: "MEGAMARKETING"},
-        {q: "Acuerdo con Administración Pública para reformar un parque es Marketing...", a: "MARKETING SOCIAL"},
-        {q: "Colaborar en lucha contra tabaco a cambio de licencia comercial es Marketing...", a: "MEGAMARKETING"},
-        {q: "Las alianzas estratégicas hacen referencia a la función de:", a: "MARKETING RELACIONAL"},
-        {q: "¿Cuáles son las variables del marketing-mix?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
-        {q: "¿Cuáles son las variables del marketing operativo?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
-        {q: "Conceptos vinculados al marketing como cultura:", a: "ORIENTACIÓN AL MERCADO Y MARKETING DE RELACIONES"},
-        {q: "Concepto mental sobre la posición de una marca en relación a otras:", a: "POSICIONAMIENTO COMPETITIVO"},
+        // TEMA 3: SEGMENTACIÓN
+        {t: '3', q: "¿Qué dimensión de la segmentación aplica técnicas estadísticas para determinar grupos de clientes?", a: "ANALÍTICA"},
+        {t: '3', q: "Si se detecta un nuevo segmento y la competencia no lo ha identificado, ¿es siempre conveniente desarrollar una estrategia centrada en él?", a: "NO, DEPENDE"},
+        {t: '3', q: "La macrosegmentación se equipara en las grandes corporaciones a las:", a: "UNIDADES ESTRATÉGICAS DE NEGOCIO"},
+        {t: '3', q: "¿En qué consiste la metodología de la segmentación a priori?", a: "DETERMINAR CON ANTERIORIDAD LOS SEGMENTOS Y LUEGO ANALIZARLOS"},
+        {t: '3', q: "¿El posicionamiento competitivo es anterior o posterior al proceso de segmentación?", a: "POSTERIOR"},
+        {t: '3', q: "Resultado de la fórmula C=|100-(180*180/330)| (Estudio de segmentación):", a: "1,81"},
+        {t: '3', q: "¿Procedimiento de división del mercado donde algunas personas pueden no clasificarse en ningún grupo?", a: "TIPOLOGÍA"},
+        {t: '3', q: "¿Cómo se clasifica la dimensión estilo de vida para la segmentación?", a: "GENERAL - SUBJETIVA"},
+        {t: '3', q: "Volumen total, físico o monetario adquirido por un grupo de compradores en lugar y periodo determinado:", a: "DEMANDA"},
+        {t: '3', q: "Cifra de ventas que realiza el conjunto de empresas que opera en un determinado mercado:", a: "DEMANDA GLOBAL"},
+        {t: '3', q: "Relación entre las ventas de una marca y las ventas totales del mercado:", a: "CUOTA DE MERCADO"},
+        {t: '3', q: "Diferencia entre las ventas totales actuales y el mercado potencial absoluto:", a: "EXPANSIBILIDAD DE LA DEMANDA"},
+        {t: '3', q: "¿Variables controlables por las empresas que influyen en la demanda?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
+        {t: '3', q: "Procedimiento de multiplicación de sucesivos porcentajes para estimar el mercado potencial:", a: "RATIOS EN CADENA"},
+        {t: '3', q: "En el modelo de Markov, ¿qué probabilidades determinan el nivel de fidelidad?", a: "LAS DE LA DIAGONAL PRINCIPAL"},
+        {t: '3', q: "¿Cómo se calcula la situación de equilibrio en el modelo de Markov?", a: "HACIENDO LAS CUOTAS DE MERCADO CONSTANTES"},
+        {t: '3', q: "¿Qué método de previsión de demanda se emplea para largo plazo?", a: "DELPHI"},
+        {t: '3', q: "Si hay grandes fluctuaciones históricas, ¿qué método a corto plazo NO se puede emplear?", a: "AJUSTE DE FUNCIONES"},
+        {t: '3', q: "¿Qué tipo de oscilación analiza el componente estacional?", a: "LAS DE UN PERÍODO INFERIOR AL AÑO"},
+        {t: '3', q: "Si hay un incremento significativo de demanda en los 2 últimos periodos, ¿qué método emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE TENDENTE A 1"},
 
-        // TEMA 6 y 7
-        {q: "Describa un canal de distribución directo:", a: "FABRICANTE - CONSUMIDOR FINAL"},
-        {q: "Describa un canal de distribución indirecto corto:", a: "FABRICANTE - MINORISTA - CONSUMIDOR FINAL"},
-        {q: "Describa un canal de distribución indirecto largo:", a: "FABRICANTE - MAYORISTA - MINORISTA - CONSUMIDOR FINAL"},
-        {q: "Función del canal donde se distribuyen cargas de stocks y pérdidas por caducidad:", a: "ASUNCIÓN DE RIESGOS"},
-        {q: "Acción de ventas a intermediarios para que vendan la marca (Estrategia):", a: "PUSH - EMPUJAR"},
-        {q: "Acción promocional a consumidores finales para que demanden la marca (Estrategia):", a: "PULL - ASPIRACIÓN"},
-        {q: "Promedio de veces que se llena y vacía de stocks un almacén:", a: "ROTACIÓN DE STOCKS"},
-        {q: "El tipo de servicio post-venta que requiere un producto determina:", a: "EL DISEÑO DEL CANAL DE DISTRIBUCIÓN"},
-        {q: "Estrategia con número limitado de puntos de venta:", a: "SELECTIVA"},
-        {q: "Estrategia de vender en el mayor número de establecimientos posible:", a: "INTENSIVA"},
-        {q: "Acuerdo donde fabricante cede marca y comercialización en exclusiva:", a: "FRANQUICIA"},
-        {q: "¿Un intermediario mayorista le puede vender a otro mayorista?", a: "SÍ"},
-        {q: "Actividades del detallista para estimular compra en punto de venta:", a: "MERCHANDISING"},
-        {q: "Deformaciones en el proceso de comunicación en la comprensión de mensajes:", a: "RUIDO"},
-        {q: "¿Cuál es el MIX de la comunicación?", a: "PUBLICIDAD, PROMOCIÓN, FUERZA DE VENTAS, RRPP Y MKT DIRECTO"},
-        {q: "Fines básicos de la comunicación:", a: "INFORMAR, PERSUADIR Y RECORDAR"},
-        {q: "Variable del mix de comunicación más impersonal:", a: "PUBLICIDAD"},
-        {q: "Variable del mix de comunicación más personal:", a: "FUERZA DE VENTAS"},
-        {q: "Comunicación directa, impersonal e interactiva por medios convencionales/tecnológicos:", a: "MARKETING DIRECTO"},
-        {q: "Variable de comunicación donde NO se paga a los medios:", a: "RELACIONES PÚBLICAS"},
+        // TEMA 4: PRODUCTO
+        {t: '4', q: "¿Una idea puede ser considerada como un producto en marketing?", a: "SÍ"},
+        {t: '4', q: "¿Enfoque de marketing centrado en las características de los productos?", a: "MIOPÍA DE MARKETING"},
+        {t: '4', q: "En el concepto de producto de Kotler, la calidad es un aspecto:", a: "FORMAL"},
+        {t: '4', q: "¿En qué etapa del ciclo de vida se consigue el máximo beneficio?", a: "CRECIMIENTO"},
+        {t: '4', q: "¿En qué etapa del ciclo de vida se consiguen las máximas ventas?", a: "MADUREZ"},
+        {t: '4', q: "¿En qué etapa del ciclo de vida se encuentra la Wii (según el temario)?", a: "CRECIMIENTO"},
+        {t: '4', q: "¿En qué etapa se comienzan a reducir los márgenes comerciales?", a: "MADUREZ"},
+        {t: '4', q: "¿Cuándo es conveniente aplicar la estrategia de relanzamiento?", a: "MADUREZ"},
+        {t: '4', q: "Conjunto de líneas de productos que comercializa una empresa:", a: "CARTERA DE PRODUCTOS"},
+        {t: '4', q: "Estrategia de lanzar una nueva marca diferente con precio y calidad inferior:", a: "SEGUNDA MARCA"},
+        {t: '4', q: "Grupo de productos estrechamente relacionados (mismas funciones, clientes, canales):", a: "LÍNEA DE PRODUCTOS"},
+        {t: '4', q: "La amplitud de una cartera hace referencia al número de:", a: "LÍNEAS DE PRODUCTOS"},
+        {t: '4', q: "La profundidad de una cartera hace referencia al número de:", a: "REFERENCIAS"},
+        {t: '4', q: "Los componentes de una marca son:", a: "NOMBRE Y LOGOTIPO"},
+        {t: '4', q: "Las marcas blancas son una estrategia de marca de:", a: "DISTRIBUIDOR"},
+        {t: '4', q: "Características de comunicador, diferenciador, promotor y protector hacen referencia al:", a: "ENVASE"},
+        {t: '4', q: "Estrategia de resaltar características para ser percibido como único:", a: "DIFERENCIACIÓN"},
+        {t: '4', q: "Forma, aspecto y color del producto que permite identificarlo:", a: "DISEÑO"},
+        {t: '4', q: "El código de barras es un elemento que se encuentra en:", a: "ETIQUETA"},
+        {t: '4', q: "¿Qué aspecto del producto hay que diseñar para reducir costes en logística?", a: "ENVASE"},
 
-        // TEMA 5
-        {q: "Para el comprador el precio es el VALOR que da a cambio de la utilidad.", a: "VALOR"},
-        {q: "Para la empresa el precio es un instrumento a CORTO plazo.", a: "CORTO"},
-        {q: "Grupos de interés afectados por el precio (además de clientes):", a: "PROVEEDORES, ACCIONISTAS, COMPETIDORES"},
-        {q: "Método de fijar precios analizando otras marcas:", a: "COMPETENCIA"},
-        {q: "Método de fijar precios que analiza a los consumidores:", a: "VALOR PERCIBIDO"},
-        {q: "Método de fijar precios considerado objetivo y justo:", a: "BASADO EN EL COSTE"},
-        {q: "¿Qué hay que determinar para fijar el precio objetivo?", a: "PUNTO MUERTO"},
-        {q: "¿Fórmula del Punto Muerto (Ingresos y Costes)?", a: "IT = CT"},
-        {q: "Lanzar nuevo producto con precio muy competitivo para captar muchos clientes:", a: "PENETRACIÓN"},
-        {q: "Lanzar nuevo producto con gran innovación y precio elevado:", a: "DESCREMACIÓN"},
-        {q: "Si cargo 25% de margen sobre precio de venta, ¿a qué margen sobre coste equivale?", a: "33,33%"},
-        {q: "Fórmula margen comercial sobre precio de coste:", a: "MC / PC"},
-        {q: "Caso Práctico: Costes 200k, Materias 100k, Producción 15.000 uds. Precio para ganar 10% sobre ventas:", a: "22,22 EUROS"},
-        {q: "Caso Práctico: Si 1.500 unidades NO se venden, ¿precio de venta?", a: "24,69 EUROS"},
-        {q: "Caso Práctico: ¿Cuál es el precio de punto muerto del caso anterior?", a: "20,00 EUROS"},
-        {q: "Caso Práctico: ¿Cantidad a vender con el precio de 22,22€?", a: "13.500 UNIDADES"},
-        {q: "Caso Práctico: Si el valor percibido es 22€, ¿aconseja vender las 15.000 uds?", a: "SÍ, SI ACEPTO MENOS BENEFICIOS"},
-        {q: "Caso Práctico: Si no se venden 1.500 uds, ¿aconseja producción?", a: "NO, PORQUE EL PUNTO MUERTO ES 22,22€"},
-        {q: "Caso Práctico: Si competencia vende a 23€, ¿cuándo aconseja vender?", a: "SI SE VENDEN LAS 15.000 UNIDADES"},
-        {q: "Estrategia de vender marca de gran volumen bajo coste para captar ventas en otros productos:", a: "LÍDER EN PÉRDIDAS"}
+        // TEMA 5: PRECIOS
+        {t: '5', q: "Para el comprador el precio es el ______ que da a cambio de la utilidad.", a: "VALOR"},
+        {t: '5', q: "Para la empresa el precio es un instrumento a ______ plazo.", a: "CORTO"},
+        {t: '5', q: "Grupos de interés afectados por el precio (además de clientes):", a: "PROVEEDORES, ACCIONISTAS, COMPETIDORES"},
+        {t: '5', q: "Método de fijar precios analizando otras marcas:", a: "COMPETENCIA"},
+        {t: '5', q: "Método de fijar precios que analiza a los consumidores:", a: "VALOR PERCIBIDO"},
+        {t: '5', q: "Método de fijar precios considerado objetivo y justo:", a: "BASADO EN EL COSTE"},
+        {t: '5', q: "¿Qué hay que determinar para fijar el precio objetivo?", a: "PUNTO MUERTO"},
+        {t: '5', q: "¿Fórmula del Punto Muerto (Ingresos y Costes)?", a: "IT = CT"},
+        {t: '5', q: "Lanzar nuevo producto con precio muy competitivo para captar muchos clientes:", a: "PENETRACIÓN"},
+        {t: '5', q: "Lanzar nuevo producto con gran innovación y precio elevado:", a: "DESCREMACIÓN"},
+        {t: '5', q: "Si cargo 25% de margen sobre precio de venta, ¿a qué margen sobre coste equivale?", a: "33,33%"},
+        {t: '5', q: "Fórmula margen comercial sobre precio de coste:", a: "MC/PC"},
+        {t: '5', q: "Caso Práctico: Costes 200k, Materias 100k, Producción 15.000 uds. Precio para ganar 10% sobre ventas:", a: "22,22 EUROS"},
+        {t: '5', q: "Caso Práctico: Si 1.500 unidades NO se venden, ¿precio de venta?", a: "24,69 EUROS"},
+        {t: '5', q: "Caso Práctico: ¿Cuál es el precio de punto muerto del caso anterior?", a: "20,00 EUROS"},
+        {t: '5', q: "Caso Práctico: ¿Cantidad a vender con el precio de 22,22€?", a: "13.500 UNIDADES"},
+        {t: '5', q: "Caso Práctico: Si el valor percibido es 22€, ¿aconseja vender las 15.000 uds?", a: "SI, SI ACEPTO MENOS BENEFICIOS"},
+        {t: '5', q: "Caso Práctico: Si no se venden 1.500 uds, ¿aconseja producción?", a: "NO PORQUE EL PUNTO MUERTO ES 22,22 EUROS"},
+        {t: '5', q: "Caso Práctico: Si competencia vende a 23€, ¿cuándo aconseja vender?", a: "SI SE VENDEN LAS 15.000 UNIDADES"},
+        {t: '5', q: "Estrategia de vender marca de gran volumen bajo coste para captar ventas en otros productos:", a: "LÍDER EN PÉRDIDAS"},
+
+        // TEMA 6 y 7: DISTRIBUCIÓN Y COMUNICACIÓN
+        {t: '6', q: "Describa un canal de distribución directo:", a: "FABRICANTE - CONSUMIDOR FINAL"},
+        {t: '6', q: "Describa un canal de distribución indirecto corto:", a: "FABRICANTE - MINORISTA - CONSUMIDOR FINAL"},
+        {t: '6', q: "Describa un canal de distribución indirecto largo:", a: "FABRICANTE - MAYORISTA - MINORISTA - CONSUMIDOR FINAL"},
+        {t: '6', q: "Función del canal donde se distribuyen cargas de stocks y pérdidas por caducidad:", a: "ASUNCIÓN DE RIESGOS"},
+        {t: '6', q: "Acción de ventas a intermediarios para que vendan la marca (Estrategia):", a: "PUSH - EMPUJAR"},
+        {t: '6', q: "Acción promocional a consumidores finales para que demanden la marca (Estrategia):", a: "PULL - ASPIRACIÓN"},
+        {t: '6', q: "Promedio de veces que se llena y vacía de stocks un almacén:", a: "ROTACIÓN DE STOCKS"},
+        {t: '6', q: "El tipo de servicio post-venta que requiere un producto determina:", a: "EL DISEÑO DEL CANAL DE DISTRIBUCIÓN"},
+        {t: '6', q: "Estrategia con número limitado de puntos de venta:", a: "SELECTIVA"},
+        {t: '6', q: "Estrategia de vender en el mayor número de establecimientos posible:", a: "INTENSIVA"},
+        {t: '6', q: "Acuerdo donde fabricante cede marca y comercialización en exclusiva:", a: "FRANQUICIA"},
+        {t: '6', q: "¿Un intermediario mayorista le puede vender a otro mayorista?", a: "SÍ"},
+        {t: '6', q: "Actividades del detallista para estimular compra en punto de venta:", a: "MERCHANDISING"},
+        {t: '6', q: "Deformaciones en el proceso de comunicación en la comprensión de mensajes:", a: "RUIDO"},
+        {t: '6', q: "¿Cuál es el MIX de la comunicación?", a: "PUBLICIDAD, PROMOCIÓN DE VENTAS, FUERZA DE VENTAS, RELACIONES PÚBLICAS Y MARKETING DIRECTO"},
+        {t: '6', q: "Fines básicos de la comunicación:", a: "INFORMAR, PERSUADIR Y RECORDAR"},
+        {t: '6', q: "Variable del mix de comunicación más impersonal:", a: "PUBLICIDAD"},
+        {t: '6', q: "Variable del mix de comunicación más personal:", a: "LA FUERZA DE VENTAS"},
+        {t: '6', q: "Comunicación directa, impersonal e interactiva por medios convencionales/tecnológicos:", a: "MARKETING DIRECTO"},
+        {t: '6', q: "Variable de comunicación donde NO se paga a los medios:", a: "RELACIONES PÚBLICAS"}
     ];
 
     let currentQuestions = [];
     let currentIndex = 0;
     let score = 0;
+    let currentTopicName = "";
 
-    function startExam() {
-        // Seleccionar 20 preguntas aleatorias
-        let shuffled = [...database].sort(() => 0.5 - Math.random());
+    // Evento ENTER en el input
+    document.getElementById("user-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            if (document.getElementById("btn-action").style.display !== "none") {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+    });
+
+    function startExam(topic) {
+        let pool = [];
+        
+        // FILTRADO POR TEMA
+        if (topic === 'all') {
+            pool = [...database]; // Copia de todo
+            currentTopicName = "EXAMEN GENERAL";
+        } else {
+            pool = database.filter(item => item.t === topic); // Filtra por el número de tema
+            currentTopicName = "TEMA " + topic;
+            if(topic === '6') currentTopicName = "TEMAS 6 Y 7";
+        }
+        
+        // ALEATORIEDAD: Barajar las preguntas
+        let shuffled = pool.sort(() => 0.5 - Math.random());
+        
+        // SELECCIONAR MAX 20 (Si es un tema, son 20 justas, pero se barajan igual)
         currentQuestions = shuffled.slice(0, 20);
         
         currentIndex = 0;
         score = 0;
         
+        // CAMBIO DE PANTALLA
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
@@ -210,30 +273,73 @@
     }
 
     function loadQuestion() {
-        document.getElementById('progress-text').innerText = `Pregunta ${currentIndex + 1} de 20`;
+        document.getElementById('progress-text').innerText = `${currentTopicName} | Pregunta ${currentIndex + 1} de ${currentQuestions.length}`;
         document.getElementById('question-text').innerText = currentQuestions[currentIndex].q;
         
-        // Resetear estado visual
-        document.getElementById('answer-text').style.display = 'none';
-        document.getElementById('btn-reveal').style.display = 'block';
-        document.getElementById('action-buttons').style.display = 'none';
+        let input = document.getElementById('user-input');
+        input.value = '';
+        input.disabled = false;
+        input.focus();
+        
+        // Reset visuales
+        document.getElementById('feedback-box').style.display = 'none';
+        document.getElementById('feedback-box').className = 'feedback';
+        document.getElementById('btn-next').style.display = 'none';
+        document.getElementById('btn-action').style.display = 'inline-block';
     }
 
-    function showAnswer() {
-        let answerBox = document.getElementById('answer-text');
-        answerBox.innerText = currentQuestions[currentIndex].a;
-        answerBox.style.display = 'block';
-        
-        document.getElementById('btn-reveal').style.display = 'none';
-        document.getElementById('action-buttons').style.display = 'flex';
+    // Función de limpieza de texto (ignora mayúsculas, tildes y signos)
+    function cleanString(str) {
+        return str.toLowerCase()
+                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/[\.,-]/g, " ")
+                  .replace(/\s+/g, ' ')
+                  .trim();
     }
 
-    function nextQuestion(correct) {
-        if (correct) score++;
+    function checkAnswer() {
+        let userAnswer = document.getElementById('user-input').value;
+        let correctAnswer = currentQuestions[currentIndex].a;
+
+        let cleanUser = cleanString(userAnswer);
+        let cleanCorrect = cleanString(correctAnswer);
+        let isCorrect = false;
+
+        // 1. Coincidencia exacta
+        if (cleanUser === cleanCorrect) {
+            isCorrect = true;
+        } 
+        // 2. Coincidencia parcial (solo si escribiste más de 3 letras)
+        else if (cleanUser.length > 3 && cleanCorrect.includes(cleanUser)) {
+             isCorrect = true;
+        }
+
+        let feedbackBox = document.getElementById('feedback-box');
+        let feedbackMsg = document.getElementById('feedback-msg');
+        let realAnswerMsg = document.getElementById('real-answer');
+
+        if (isCorrect) {
+            score++;
+            feedbackBox.classList.add('correct');
+            feedbackMsg.innerHTML = "<strong>¡CORRECTO!</strong>";
+            realAnswerMsg.innerText = "";
+        } else {
+            feedbackBox.classList.add('wrong');
+            feedbackMsg.innerHTML = "<strong>INCORRECTO</strong>";
+            realAnswerMsg.innerHTML = "La respuesta correcta era:<br>" + correctAnswer;
+        }
+
+        feedbackBox.style.display = 'block';
         
+        document.getElementById('user-input').disabled = true;
+        document.getElementById('btn-action').style.display = 'none';
+        document.getElementById('btn-next').style.display = 'inline-block';
+        document.getElementById('btn-next').focus();
+    }
+
+    function nextQuestion() {
         currentIndex++;
-        
-        if (currentIndex < 20) {
+        if (currentIndex < currentQuestions.length) {
             loadQuestion();
         } else {
             showResults();
@@ -247,17 +353,20 @@
         let display = document.getElementById('score-display');
         let msg = document.getElementById('message-display');
         
-        display.innerText = `${score} / 20`;
+        display.innerText = `${score} / ${currentQuestions.length}`;
         
-        if (score >= 18) {
-            display.style.color = '#2e7d32';
-            msg.innerText = "¡INCREÍBLE! Estás listísimo para el examen.";
-        } else if (score >= 10) {
-            display.style.color = '#f57c00';
-            msg.innerText = "Aprobado, pero sigue practicando para asegurar.";
+        // Mensajes de ánimo según nota
+        let percentage = (score / currentQuestions.length) * 10;
+        
+        if (percentage >= 9) {
+            display.style.color = '#27ae60';
+            msg.innerText = "¡IMPRESIONANTE! Nivel Experto.";
+        } else if (percentage >= 5) {
+            display.style.color = '#f39c12';
+            msg.innerText = "Aprobado. Sigue practicando para asegurar el 10.";
         } else {
-            display.style.color = '#c62828';
-            msg.innerText = "Sigue dándole caña, todavía hay que memorizar más.";
+            display.style.color = '#c0392b';
+            msg.innerText = "Sigue dándole caña. ¡La próxima sale mejor!";
         }
     }
 </script>
