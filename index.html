@@ -221,8 +221,8 @@
         {t: '1', q: "Acuerdo con Administración Pública para reformar un parque es Marketing...", a: "MARKETING SOCIAL"},
         {t: '1', q: "Colaborar en lucha contra tabaco a cambio de licencia comercial es Marketing...", a: "MEGAMARKETING"},
         {t: '1', q: "Las alianzas estratégicas hacen referencia a la función de:", a: "MARKETING RELACIONAL"},
-        {t: '1', q: "¿Cuáles son las variables del marketing-mix?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
-        {t: '1', q: "¿Cuáles son las variables del marketing operativo?", a: "PRODUCTO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
+        {t: '1', q: "¿Cuáles son las variables del marketing-mix?", a: "PRODUCTO/SERVICIO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
+        {t: '1', q: "¿Cuáles son las variables del marketing operativo?", a: "PRODUCTO/SERVICIO, PRECIO, DISTRIBUCIÓN Y COMUNICACIÓN"},
         {t: '1', q: "Conceptos vinculados al marketing como cultura:", a: "ORIENTACIÓN AL MERCADO Y MARKETING DE RELACIONES"},
         {t: '1', q: "Concepto mental sobre la posición de una marca en relación a otras:", a: "POSICIONAMIENTO COMPETITIVO"},
         {t: '2', q: "¿Qué teoría sobre el comportamiento de compra considera que los individuos compran los productos que maximizan su utilidad?", a: "ECONÓMICA"},
@@ -477,8 +477,6 @@
 
         if (cleanUser === cleanCorrect) {
             isCorrect = true;
-        } else if (cleanUser.length > 3 && cleanCorrect.includes(cleanUser)) {
-             isCorrect = true;
         }
 
         let feedbackBox = document.getElementById('feedback-box');
