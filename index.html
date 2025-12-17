@@ -67,6 +67,25 @@
 
         @media (max-width: 600px) {
             .github-corner p { display: none; }
+
+            /* 1. Aumentamos el padding superior de la tarjeta para bajar el contenido */
+            .card { 
+                padding: 70px 20px 30px 20px !important; 
+            }
+
+            /* 2. Le damos margen lateral al texto para que no toque el botón */
+            .progress { 
+                padding: 0 40px; 
+                line-height: 1.4;
+            }
+
+            /* 3. Ajustamos el botón de salir para que no flote tan al centro */
+            .btn-exit {
+                top: 15px;
+                right: 15px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
         }
 
         /* --- NUEVOS ESTILOS PARA EL MODO PERSONALIZADO --- */
@@ -176,7 +195,7 @@
 
 <script>
     const database = [
-        {t: 'fijas', q: "La diferencia entre las ventas totales actuales y el mercado potencial absoluto se denomina", a: "EXPANSIÓN DE LA DEMANDA"},
+        {t: 'fijas', q: "La diferencia entre las ventas totales actuales y el mercado potencial absoluto se denomina", a: "EXPANSIBILIDAD DE LA DEMANDA"},
         {t: 'fijas', q: "¿Qué métodos de previsión de demanda se emplean para realizar estimaciones a largo plazo?", a: "DELPHI"},
         {t: 'fijas', q: "Si existen grandes fluctuaciones en los datos históricos de la demanda, ¿qué método de previsión de demanda a corto plazo no se puede emplear?", a: "AJUSTE DE FUNCIONES"},
         {t: 'fijas', q: "Cuando se analizan los datos históricos de la demanda de un producto se aprecia que en los dos últimos periodos se ha producido un incremento significativo de la demanda, ¿qué tipo de método de previsión de demanda se debe emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE DE ALISAMIENTO TENDENTE A 1"},
@@ -244,7 +263,7 @@
         {t: '3', q: "¿Qué método de previsión de demanda se emplea para largo plazo?", a: "DELPHI"},
         {t: '3', q: "Si hay grandes fluctuaciones históricas, ¿qué método a corto plazo NO se puede emplear?", a: "AJUSTE DE FUNCIONES"},
         {t: '3', q: "¿Qué tipo de oscilación analiza el componente estacional?", a: "LAS DE UN PERÍODO INFERIOR AL AÑO"},
-        {t: '3', q: "Si hay un incremento significativo de demanda en los 2 últimos periodos, ¿qué método emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE TENDENTE A 1"},
+        {t: '3', q: "Cuando se analizan los datos históricos de la demanda de un producto se aprecia que en los dos últimos periodos se ha producido un incremento significativo de la demanda, ¿qué tipo de método de previsión de demanda se debe emplear?", a: "BANDA DE ALISADO 3 O COEFICIENTE DE ALISAMIENTO TENDENTE A 1"},
         {t: '4', q: "¿Una idea puede ser considerada como un producto en marketing?", a: "SÍ"},
         {t: '4', q: "¿Enfoque de marketing centrado en las características de los productos?", a: "MIOPÍA DE MARKETING"},
         {t: '4', q: "En el concepto de producto de Kotler, la calidad es un aspecto:", a: "FORMAL"},
