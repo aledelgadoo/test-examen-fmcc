@@ -55,7 +55,7 @@
             top: 2px;
             left: 20px;
             text-align: left;
-            z-index: 1000; /* Para asegurar que flote por encima de todo */
+            z-index: 1000;
         }
 
         .github-corner p {
@@ -65,10 +65,42 @@
             font-weight: 600;
         }
 
-        /* Opcional: En móviles muy pequeños, ocultamos el texto y dejamos solo la estrella para que no moleste */
         @media (max-width: 600px) {
             .github-corner p { display: none; }
         }
+
+        /* --- NUEVOS ESTILOS PARA EL MODO PERSONALIZADO --- */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .topic-label {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #2c3e50;
+            border: 2px solid transparent;
+        }
+
+        .topic-label:hover { background: #dfe6e9; }
+
+        /* Cuando el checkbox (oculto) está marcado, cambiamos el estilo del label */
+        .topic-check:checked + .topic-label {
+            background-color: #d6eaf8;
+            border-color: #3498db;
+            color: #2980b9;
+        }
+
+        .topic-check { display: none; } /* Ocultamos el checkbox feo */
     </style>
 </head>
 <body>
@@ -100,8 +132,21 @@
         <button class="btn btn-theme" onclick="startExam('5')">Tema 5</button>
         <button class="btn btn-theme" onclick="startExam('6')">Tema 6 y 7</button>
         
+        <button class="btn btn-theme" style="background-color: #8e44ad; grid-column: span 2;" onclick="openCustomMenu()">🎛️ MODO PERSONALIZADO (Elige temas)</button>
+
         <button class="btn btn-general" onclick="startExam('all')">🎲 EXAMEN GENERAL (Aleatorio)</button>
     </div>
+</div>
+
+<div class="card hidden" id="custom-screen">
+    <button class="btn-exit" onclick="closeCustomMenu()">✕ Volver</button>
+    <h1>Configura tu Examen</h1>
+    <h2>Selecciona los temas que quieres mezclar:</h2>
+    
+    <div class="checkbox-grid" id="topics-container">
+        </div>
+
+    <button class="btn btn-action" onclick="startCustomExam()">¡Empezar Test Personalizado!</button>
 </div>
 
 <div class="card hidden" id="quiz-screen">
@@ -131,7 +176,6 @@
 
 <script>
     const database = [
-
         {t: 'fijas', q: "La diferencia entre las ventas totales actuales y el mercado potencial absoluto se denomina", a: "EXPANSIÓN DE LA DEMANDA"},
         {t: 'fijas', q: "¿Qué métodos de previsión de demanda se emplean para realizar estimaciones a largo plazo?", a: "DELPHI"},
         {t: 'fijas', q: "Si existen grandes fluctuaciones en los datos históricos de la demanda, ¿qué método de previsión de demanda a corto plazo no se puede emplear?", a: "AJUSTE DE FUNCIONES"},
@@ -142,7 +186,7 @@
         {t: 'fijas', q: "¿Cómo se denomina el método para fijar los precios que analiza a los consumidores?", a: "VALOR PERCIBIDO"},
         {t: 'fijas', q: "Describa un canal de distribución indirecto largo:", a: "FABRICANTE - MAYORISTA - MINORISTA - CONSUMIDOR FINAL"},
         
-        {t: '1', q: "En la definición de Marketing, ¿cuál es la palabra clave?", a: "INTERCAMBIO"},
+        {t: '1', q: "En la definición de Marketing, ¿cuál es la palabra clave a partir de la cual se desarrollan relaciones de Marketing?", a: "INTERCAMBIO"},
         {t: '1', q: "¿Cómo definiría el Marketing como ACCIÓN?", a: "CONQUISTA DE MERCADOS"},
         {t: '1', q: "¿Qué concepto es tratado en el Marketing como ilimitado?", a: "DESEOS"},
         {t: '1', q: "Llamar a clientes para medir calidad percibida es Marketing...", a: "MARKETING RELACIONAL"},
@@ -164,7 +208,7 @@
         {t: '1', q: "Concepto mental sobre la posición de una marca en relación a otras:", a: "POSICIONAMIENTO COMPETITIVO"},
         {t: '2', q: "¿Qué teoría sobre el comportamiento de compra considera que los individuos compran los productos que maximizan su utilidad?", a: "ECONÓMICA"},
         {t: '2', q: "¿Qué teoría sobre el comportamiento de compra se aplica preferentemente para el diseño de productos, envases y mensajes publicitarios?", a: "PSICOANALÍTICA"},
-        {t: '2', q: "¿Qué concepto de la teoría del aprendizaje se califica como positivo si la experiencia de compra ha sido satisfactoria?", a: "FORTALECIMIENTO"},
+        {t: '2', q: "¿Qué concepto de la teoría del aprendizaje se califica como positivo si la experiencia de compra ha sido satisfactoria y negativo en caso contrario?", a: "FORTALECIMIENTO"},
         {t: '2', q: "La forma en que el consumidor recoge, procesa e interpreta los estímulos sensoriales se denomina:", a: "PERCEPCIÓN"},
         {t: '2', q: "La predisposición general que dirige el comportamiento de compra de los individuos se denomina:", a: "MOTIVACIÓN"},
         {t: '2', q: "En el modelo de comportamiento de compra individual, ¿la personalidad es una variable...?", a: "VARIABLE INTERNA"},
@@ -271,9 +315,80 @@
         }
     });
 
+    // --- NUEVAS FUNCIONES PARA MODO PERSONALIZADO ---
+
+    function openCustomMenu() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('custom-screen').classList.remove('hidden');
+
+        // Escaneamos la base de datos para ver qué temas existen
+        // Filtramos 'fijas' para que no salga, solo temas numéricos
+        const uniqueTopics = [...new Set(database.map(item => item.t))].filter(t => t !== 'fijas').sort();
+        
+        const container = document.getElementById('topics-container');
+        container.innerHTML = '';
+
+        uniqueTopics.forEach(topic => {
+            let labelText = "Tema " + topic;
+            if (topic === '6') labelText = "Temas 6 y 7"; // Ajuste estético
+            
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `
+                <input type="checkbox" id="check-${topic}" class="topic-check" value="${topic}">
+                <label for="check-${topic}" class="topic-label">
+                    ✅ ${labelText}
+                </label>
+            `;
+            container.appendChild(wrapper);
+        });
+    }
+
+    function closeCustomMenu() {
+        document.getElementById('custom-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    function startCustomExam() {
+        const checkedBoxes = document.querySelectorAll('.topic-check:checked');
+        
+        if (checkedBoxes.length === 0) {
+            alert("¡Selecciona al menos un tema, bro!");
+            return;
+        }
+
+        const selectedTopics = Array.from(checkedBoxes).map(cb => cb.value);
+
+        // Filtramos preguntas que coincidan con CUALQUIERA de los temas seleccionados
+        let pool = database.filter(item => selectedTopics.includes(item.t));
+
+        if (pool.length === 0) {
+            alert("Error: No se encontraron preguntas para estos temas.");
+            return;
+        }
+
+        currentTopicName = "PERSONALIZADO (" + selectedTopics.join(', ') + ")";
+        
+        // Barajamos
+        let shuffled = pool.sort(() => 0.5 - Math.random());
+        
+        // Seleccionamos max 20
+        currentQuestions = shuffled.slice(0, 20);
+        
+        currentIndex = 0;
+        score = 0;
+        
+        document.getElementById('custom-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        
+        loadQuestion();
+    }
+
+    // --- FIN FUNCIONES NUEVAS ---
+
     function returnToMenu() {
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.add('hidden');
+        document.getElementById('custom-screen').classList.add('hidden'); // Aseguramos ocultar este también
         document.getElementById('start-screen').classList.remove('hidden');
     }
 
@@ -281,7 +396,7 @@
         let pool = [];
         
         if (topic === 'all') {
-            pool = database.filter(item => item.t !== 'fijas'); // En el general NO metemos las fijas para no falsear
+            pool = database.filter(item => item.t !== 'fijas');
             currentTopicName = "EXAMEN GENERAL";
         } else if (topic === 'fijas') {
             pool = database.filter(item => item.t === 'fijas');
@@ -297,10 +412,7 @@
             return;
         }
 
-        // Si es el modo 'fijas', no barajamos si quieres mantener el orden, o sí. (Aquí las barajo por defecto)
         let shuffled = pool.sort(() => 0.5 - Math.random());
-        
-        // Seleccionamos max 20, o todas las que haya si son menos (como en 'fijas')
         currentQuestions = shuffled.slice(0, 20);
         
         currentIndex = 0;
